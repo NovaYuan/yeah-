@@ -1,0 +1,23 @@
+{
+  "name": "yeah-",
+  "homepage": "index.html",
+  "authors": [
+    "NovaYuan <qiujuan_yuan@163.com>"
+  ],
+  "description": "for one's birthday",
+  "main": "index.html",
+  "moduleType": [],
+  "keywords": [
+    "happy",
+    "birthday"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
