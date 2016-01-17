@@ -1,40 +1,40 @@
 var Type = (function(){
-        var $el = $(".content");
-        this.typeWords = function(){
-                var loadLine = "<span class='load-line' style='display: none;'>_</span>",
-                        content = "",
-                        words_one = "1989年的一个冬天，叶大神降临到人间。",
-                        words_two = "今天，是叶大神来到人间的第<span class='special'>26</span>个年头。",
-                        words_three = "人间很美，",
-                        words_four = "大神还是先闯关吧~",
-                        wordsArr = [words_one, words_two, words_three, words_four];
-
-                $.each(wordsArr, function(i, o){
-                        var line = o.split("");
-                        $.each(line, function(j, q){
-                                if(q == line[line.length - 1] ){
-                                        content +=  "\n";
-                                        $el.html(content)
-                                }else{
-                                        $el.html(content + loadLine);
-                                        var $loadLine = $(".load-line");
-                                        $loadLine.show();
-                                        setTimeout(function(){
-                                                $loadLine.remove();
-                                                content += q;
-                                                //$el.html(content)
-                                        }, 5000);
-                                        //content += q;
-                                        //$el.html(content)
-                                }
-                        })
-                });
-        };
+        var $body = $("body"),
+                $el = $(".content"),
+                completing = 0,
+                completed = false;
+        //this.typeWords = function(){
+        //        var loadLine = "<span class='load-line' style='display: none;'>_</span>",
+        //                content = "",
+        //                words_one = "1989年的一个冬天，叶大神降临到人间。",
+        //                words_two = "今天，是叶大神来到人间的第<span class='special'>26</span>个年头。",
+        //                words_three = "人间很美，",
+        //                words_four = "大神还是先闯关吧~",
+        //                wordsArr = [words_one, words_two, words_three, words_four];
+        //
+        //        $.each(wordsArr, function(i, o){
+        //                var line = o.split("");
+        //                $.each(line, function(j, q){
+        //                        if(q == line[line.length - 1] ){
+        //                                content +=  "\n";
+        //                                $el.html(content)
+        //                        }else{
+        //                                $el.html(content + loadLine);
+        //                                var $loadLine = $(".load-line");
+        //                                $loadLine.show();
+        //                                setTimeout(function(){
+        //                                        $loadLine.remove();
+        //                                        content += q;
+        //                                }, 5000);
+        //                        }
+        //                })
+        //        });
+        //};
 
         this.initPic = function(){
                 var $content = $(".content"),
                         $gameContainer = $(".img-game-container"),
-                        $contentTitle = '<h2>首先，我们来玩个游戏，请在屏幕中找出最后一小块图</h2>',
+                        $contentTitle = '<h2>首先，我们来玩个游戏，先完成拼图</h2>',
                         randomNum = Math.floor(Math.random()*9),
                         isHidden = "";
 
@@ -48,6 +48,11 @@ var Type = (function(){
                                         '<img src="images/9.jpg"/>' +
                                         '</div>' +
                                         '</div>';
+
+                        //打乱顺序
+                        data = data.sort(function(a, b){
+                                return Math.random() > 0.5 ? -1:1
+                        });
                         $.each(data, function(i, o){
                                 var url,
                                         imgHide = "";
@@ -70,31 +75,18 @@ var Type = (function(){
                         $gameContainer.append(imgContent);
                         $content.append(imgPreview);
 
-                        //$(".img-bread").last().removeClass("img-bread-show").addClass("");
-
-                        setTimeout(function(){
-                                $(".footer").show();
-                        }, 500)
+                        $(".footer").show();
+                        $.AMUI.progress.done();
                 })
         };
         this.render = function(){
                 var that = this;
 
+                $.AMUI.progress.start();
                 that.initPic();
         };
 
         var eventHandler = {
-                showPicHandler: function(){
-                        var $this = $(this);
-
-                        if($this.hasClass("img-bread-hide")){
-                                $this.removeClass("img-bread-hide");
-                                $this.children("img").css({
-                                        "visibility": "visible"
-                                });
-                                alert("机智如你！")
-                        }
-                },
                 movePicHandler: function(){
                         var $this = $(this),
                                 index = $this.index(),
@@ -127,11 +119,45 @@ var Type = (function(){
                                         }
                                         break;
                         }
+
+                        if($(".img-bread-show:eq(0)").data("id") == "1" &&
+                                $(".img-bread-show:eq(1)").data("id") == "2" &&
+                                $(".img-bread-show:eq(2)").data("id") == "3" &&
+                                $(".img-bread-show:eq(3)").data("id") == "4" &&
+                                $(".img-bread-show:eq(4)").data("id") == "5" &&
+                                $(".img-bread-show:eq(5)").data("id") == "6" &&
+                                $(".img-bread-show:eq(6)").data("id") == "7" &&
+                                $(".img-bread-show:eq(7)").data("id") == "8" &&
+                                $(".img-bread-show:eq(8)").data("id") == "9" ){
+
+                                $(".img-bread-hide").children("img").css({
+                                        "visibility": "visible"
+                                }).removeClass("img-bread-hide");
+
+                                setTimeout(function(){
+                                        var $modal = $("#completed-alert");
+                                        $modal.modal('open');
+                                }, 500);
+                        }
+                },
+                goToNextHandler: function(e){
+                        e.preventDefault();
+
+                        $("#my-words").css({
+                                height: screen.height + "px"
+                        });
+                        $body.animate({
+                                scrollTop: screen.height + 50 + "px"
+                        }, 1000);
                 }
         };
 
         this.render();
         //事件处理
-        $("body").on('click', ".img-bread-hide", eventHandler.showPicHandler);
-        $("body").on('click', ".img-bread-show", eventHandler.movePicHandler);
+        //$body.on('click', ".img-bread-hide", eventHandler.showPicHandler);
+        $body.on('click', ".img-bread-show", eventHandler.movePicHandler);
+        $body.on("click", ".go-to-next", eventHandler.goToNextHandler);
+        $("#completed-alert").on("closed.modal.amui", function(){
+                $(".next").show()
+        })
 })();
